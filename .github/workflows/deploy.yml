@@ -1,4 +1,4 @@
-name: 🚀 Deploy Frontend to AWS (Apache)
+name: 🚀 Deploy Fullstack App to AWS (Apache)
 
 on:
   push:
@@ -13,21 +13,24 @@ jobs:
       - name: 🚀 检出代码
         uses: actions/checkout@v3
 
-      - name: 🔧 安装 Node.js 并构建前端
-        run: |
-          sudo apt update
-          sudo apt install -y nodejs npm
-          npm install
-          npm run build  # 生成前端静态文件（React: `build/`，Vue: `dist/`）
-
       - name: 🔑 配置 SSH 连接
         run: |
           echo "${{ secrets.AWS_EC2_SSH_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-      - name: 📂 部署到 AWS EC2（Apache）
+      - name: 📂 部署前端到 Apache 服务器
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem -r build/* ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/var/www/frontend
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r frontend/* ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/var/www/html/
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
-            sudo systemctl restart apache2  # 重新启动 Apache
+            sudo systemctl restart apache2
+          EOF
+
+      - name: 📦 部署后端到 AWS EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r backend/* ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/home/ubuntu/backend
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
+            cd /home/ubuntu/backend
+            npm install
+            sudo kill -9 $(sudo lsof -t -i:3000) || true  # 关闭旧进程
+            nohup node server.js > output.log 2>&1 &  # 后台运行
           EOF

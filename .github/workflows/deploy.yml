@@ -1,9 +1,9 @@
-name: 🚀 Auto Deploy to AWS EC2
+name: 🚀 Deploy Frontend to AWS (Apache)
 
 on:
   push:
     branches:
-      - main  # 触发部署的分支
+      - main  # 监听 main 分支的 push 事件
 
 jobs:
   deploy:
@@ -13,16 +13,21 @@ jobs:
       - name: 🚀 检出代码
         uses: actions/checkout@v3
 
+      - name: 🔧 安装 Node.js 并构建前端
+        run: |
+          sudo apt update
+          sudo apt install -y nodejs npm
+          npm install
+          npm run build  # 生成前端静态文件（React: `build/`，Vue: `dist/`）
+
       - name: 🔑 配置 SSH 连接
         run: |
           echo "${{ secrets.AWS_EC2_SSH_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-      - name: 📂 部署到 AWS EC2
+      - name: 📂 部署到 AWS EC2（Apache）
         run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r build/* ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/var/www/frontend
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
-            cd /var/www/html  # 进入项目目录
-            git pull origin main  # 拉取最新代码
-            npm install  # 安装 Node.js 依赖（如果是 Node.js 项目）
-            pm2 restart all  # 重新启动应用（如果使用 PM2）
+            sudo systemctl restart apache2  # 重新启动 Apache
           EOF

@@ -1,0 +1,244 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f6f9;
+    text-align: center;
+}
+
+h1 {
+    font-size: 28px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    word-break: break-word;
+}
+
+th {
+    background: #0056b3;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 控制列宽 */
+th:nth-child(1), td:nth-child(1) { /* ID*/
+    width: 50px;
+}
+
+th:nth-child(2), td:nth-child(2) { /* Name*/
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Category*/
+    width: 120px;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Price */
+    width: 100px;
+}
+
+th:nth-child(5), td:nth-child(5) { /* Stock */
+    width: 80px;
+}
+
+th:nth-child(6), td:nth-child(6) { /* Description */
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+th:nth-child(7), td:nth-child(7) { /* Image */
+    width: 80px;
+}
+
+th:nth-child(8), td:nth-child(8) { /* Actions */
+    width: 130px;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.ellipsis:hover {
+    overflow: visible;
+    white-space: normal;
+    background: #fff;
+    position: absolute;
+    z-index: 10;
+    padding: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn {
+    padding: 6px 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: black;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-close {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.modal h2 {
+    font-size: 20px;
+    color: #333;
+}
+
+.modal input, .modal select, .modal textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-group .btn {
+    flex: 1;
+    margin: 5px;
+}
+
+.thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+
+.thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-preview {
+    width: 200px;
+    height: 200px;
+    margin: 10px auto;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.product-image {
+    cursor: pointer;
+    color: #0056b3;
+    text-decoration: underline;
+}

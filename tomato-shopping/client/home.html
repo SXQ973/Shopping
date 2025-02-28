@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tomato Shopping Homepage</title>
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+  <!-- Top banner -->
+  <div class="navbar">
+    <div class="logo" onclick="showHomePage()">Tomato Shopping</div>
+    <div class="links">
+      <a href="#" onclick="showHomePage()">Home</a>
+      <a href="#">My Account</a>
+      <div class="cart" id="cart">
+        Cart
+        <div class="cart-window">
+          <h4>Shopping Cart</h4> 
+          <ul id="cart-items">
+            <!-- Cart items will be dynamically generated here -->
+          </ul>
+          <div class="cart-summary">
+            <span class="cart-summary-total">Total:</span>
+            <span class="cart-summary-price">$<span id="cart-total">0.00</span></span>
+          </div>
+          <a href="#" class="checkout-btn">Checkout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel -->
+  <div class="carousel">
+    <div class="carousel-images" id="carousel-images">
+      <img src="img/banner1.jpg" alt="Advertisement1">
+      <img src="img/banner2.jpg" alt="Advertisement2">
+      <img src="img/banner3.jpg" alt="Advertisement3">
+    </div>
+    <div class="buttons">
+      <button id="prev">❮</button>
+      <button id="next">❯</button>
+    </div>
+    <div class="carousel-indicators" id="carousel-indicators">
+      <div class="indicator active"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+    </div>
+    <!-- Search Box -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search for products and brands">
+      <button>Search</button>
+    </div>
+  </div>
+
+  <!-- Cart notification -->
+  <div class="cart-notification" id="cart-notification">
+    Item added to cart successfully!
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <!-- Left categories -->
+    <div class="categories">
+      <h2>All Categories</h2>
+      <ul id="categories-list">
+        <!-- Categories will be loaded here dynamically -->
+        <div class="loading">
+          <div class="loading-spinner"></div>
+        </div>
+      </ul>
+    </div>
+    
+    <!-- Right product display -->
+    <div class="rights">
+      <!-- Product listing section -->
+      <div id="product-listing">
+        <!-- Breadcrumb navigation -->
+        <nav class="breadcrumb" id="breadcrumb">
+          <a href="#" onclick="showHomePage()">Home</a>
+          <span>&gt;</span>
+          <p id="current-category">All</p>
+        </nav>
+        
+        <!-- Products grid -->
+        <div class="products" id="products-grid">
+          <!-- Loading spinner -->
+          <div class="loading">
+            <div class="loading-spinner"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Product detail section (hidden by default) -->
+      <div id="product-detail" class="product-detail">
+        <!-- Product detail content will be dynamically generated here -->
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <div class="footer">
+    © 2025 Tomato. All rights reserved.
+  </div>
+  <script src = "js/home.js"></script>
+</body>
+</html>

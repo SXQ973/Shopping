@@ -8,26 +8,6 @@ let cart = {
   items: [],
   total: 0
 };
-// // Shopping cart
-// let cart = {
-//   items: [
-//     {
-//       id: 1,
-//       title: 'UGREEN 100W USB C Charger Plug, 4-Port GaN Type C Fast Wall Power Adapter',
-//       price: 10.0,
-//       quantity: 1
-//     },
-//     {
-//       id: 2,
-//       title: 'Seagate STKP16000400',
-//       price: 5.0,
-//       quantity: 2
-//     }
-//   ],
-//   total: 10.2
-// };
-
-// DOM Elements
 const productsGrid = document.getElementById('products-grid');
 const breadcrumb = document.getElementById('breadcrumb');
 const categoriesList = document.getElementById('categories-list');
@@ -113,8 +93,6 @@ async function fetchProductsByCategory(cateid) {
    if (!categoriesData || categoriesData.length === 0) {
        await fetchCategories();
    }
-   
-   // 直接更新元素内容，而不重新分配变量
    const currentCategoryEl = document.getElementById('current-category');
    if (currentCategoryEl) {
      currentCategoryEl.textContent = getCategoryName(currentCategory);
@@ -130,7 +108,7 @@ async function fetchProductsByCategory(cateid) {
    })
    .then(response => response.json())
    .then(data => {
-       console.log("✅ 获取的产品数据:", data); 
+       console.log("✅ Product data:", data); 
        productsData[cateid] = data;
        renderProducts(productsData[cateid]);
        // Update active category in sidebar
@@ -210,7 +188,7 @@ async function showProductDetail(productId, cateid) {
     // Save current product
     currentProduct = product;
     
-    // Update breadcrumb - 修复面包屑导航
+    // Update breadcrumb
     const detailBreadcrumb = document.createElement('nav');
     detailBreadcrumb.className = 'breadcrumb';
     detailBreadcrumb.innerHTML = `
@@ -254,8 +232,6 @@ async function showProductDetail(productId, cateid) {
         </div>
       </div>
     `;
-    
-    // 清除并添加新内容
     productDetail.innerHTML = '';
     productDetail.appendChild(detailBreadcrumb);
     productDetail.appendChild(detailContent);
@@ -270,7 +246,6 @@ async function showHomePage() {
   try {
     await fetchProductsByCategory(1);
     console.log("showHomePage: ");
-    // 修复面包屑导航
     const listingBreadcrumb = document.getElementById('breadcrumb');
     if (listingBreadcrumb) {
       listingBreadcrumb.innerHTML = `
@@ -280,7 +255,6 @@ async function showHomePage() {
       `;
     }
     
-    // 直接使用getElementById获取元素而不重新分配常量
     const currentCategoryEl = document.getElementById('current-category');
     if (currentCategoryEl) {
       currentCategoryEl.textContent = 'All';
@@ -298,7 +272,6 @@ async function showHomePage() {
 async function showCategoryPage(category) {
   try {
     await fetchProductsByCategory(category);
-    // 修复面包屑导航
     const listingBreadcrumb = document.getElementById('breadcrumb');
     if (listingBreadcrumb) {
       listingBreadcrumb.innerHTML = `
@@ -307,8 +280,6 @@ async function showCategoryPage(category) {
         <p id="current-category">${getCategoryName(category)}</p>
       `;
     }
-    
-    // 直接更新文本内容而不重新分配变量
     const currentCategoryEl = document.getElementById('current-category');
     if (currentCategoryEl) {
       currentCategoryEl.textContent = getCategoryName(category);
@@ -423,10 +394,8 @@ function addToCart(product) {
    // Get quantity
    const quantityInput = document.getElementById('quantity-input');
    const quantity = parseInt(quantityInput.value) || 1;
-   
    // Check if item already in cart
    const existingItem = cart.items.find(item => item.id === currentProduct.pid);
-   
    if (existingItem) {
      // Increase quantity
      existingItem.quantity += quantity;
@@ -455,11 +424,9 @@ function addToCart(product) {
  function changeCartItemQuantity(id, change) {
    const item = cart.items.find(item => item.id === id);
    if (!item) return;
-   
    // Apply change but ensure quantity is at least 1
    const newQuantity = item.quantity + change;
    if (newQuantity < 1) return;
-   
    item.quantity = newQuantity;
    updateCartTotal();
    updateCartUI();
@@ -469,12 +436,10 @@ function addToCart(product) {
  function removeCartItem(id) {
    const itemIndex = cart.items.findIndex(item => item.id === id);
    if (itemIndex === -1) return;
-   
    // Remove item
    cart.items.splice(itemIndex, 1);
    updateCartTotal();
    updateCartUI();
-   
    // Show notification
    cartNotification.textContent = "Item removed from cart";
    cartNotification.style.backgroundColor = "#ff5000";

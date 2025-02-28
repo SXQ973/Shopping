@@ -8,6 +8,7 @@ const deleteModal = document.getElementById('deleteModal');
 const imagePreview = document.getElementById('imagePreview');
 const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
+const notification = document.getElementById('notification');
 
 const API_URL = 'http://localhost:5500';
 let products = [];
@@ -16,30 +17,48 @@ let editingProductId = null;
 let deletingProductId = null;
 let currentImage = null;
 
+// Show notifications
+function showNotification(message, isSuccess = true) {
+    notification.textContent = message;
+    notification.className = 'notification';
+    notification.classList.add(isSuccess ? 'success' : 'error');
+    notification.style.display = 'block';
+    
+    // Last for 3 seconds
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// Sort Products by product id(Desc)
+function sortProductsByIdDesc(productsArray) {
+    return [...productsArray].sort((a, b) => b.pid - a.pid);
+}
 
 // ProductList: Load products from the server
 async function fetchProducts() {
     console.log(`${API_URL}/products`);
-    const response = await fetch(`${API_URL}/products`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
+    try {
+        const response = await fetch(`${API_URL}/products`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (!response.ok) {
-            throw new Error('❌ Failed to fetch categories');
+            throw new Error('❌ Failed to fetch products');
         }
-        return response.json();
-    })
-    .then(data => { 
-        products = data; 
+        
+        const data = await response.json();
+        // 对获取的数据按ID倒序排序
+        products = sortProductsByIdDesc(data);
         renderTable();
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('❌ Error fetching products:', error);
-    });
+        showNotification('Failed to fetch products', false);
+    }
 }
 
 // Categories: Load categories from the server
@@ -66,6 +85,7 @@ function fetchCategories() {
     })
     .catch(error => {
         console.error('❌ Error fetching categories:', error);
+        showNotification('Failed to fetch categories', false);
     });
 }
 
@@ -90,15 +110,14 @@ async function addProduct(productData) {
             },
             body: JSON.stringify(productData)
         });
+        
         if (!response.ok) throw new Error('Failed to add product');
-    //    const newProduct = await response.json();
-        products.push(productData);
-        console.log("productData:",products);
-        renderTable();
+        await fetchProducts();
+        showNotification('Product added successfully!');
         return true;
     } catch (error) {
         console.error('Error adding product:', error);
-        alert('Failed to add product');
+        showNotification('Failed to add product', false);
         return false;
     }
 }
@@ -118,6 +137,7 @@ function editProduct(pid){
     modalTitle.textContent = "Edit Product";
     productModal.style.display = "block";
 }
+
 // Send update data to server
 async function sendUpdatedToServer(pid, productData) {
     console.log("sendUpdatedToServer: pid:",pid);
@@ -129,16 +149,14 @@ async function sendUpdatedToServer(pid, productData) {
             },
             body: JSON.stringify(productData)
         });
+        
         if (!response.ok) throw new Error('Failed to update product');
-        const index = products.findIndex(p => p.pid === pid);
-        if (index !== -1) {
-            products[index] = { ...products[index], ...productData };
-        }
-        fetchProducts();
+        await fetchProducts();
+        showNotification('Product updated successfully!');
         return true;
     } catch (error) {
         console.error('Error updating product:', error);
-        alert('Failed to update product');
+        showNotification('Failed to update product', false);
         return false;
     }
 }
@@ -149,14 +167,14 @@ async function deleteProduct(id) {
         const response = await fetch(`${API_URL}/products/${id}`, {
             method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Failed to delete product');
         
-        products = products.filter(p => p.id !== id);
-        fetchProducts();
+        if (!response.ok) throw new Error('Failed to delete product');
+        await fetchProducts();
+        showNotification('Product deleted successfully!');
         return true;
     } catch (error) {
         console.error('Error deleting product:', error);
-        alert('Failed to delete product');
+        showNotification('Failed to delete product', false);
         return false;
     }
 }
@@ -249,9 +267,9 @@ function validateForm() {
         errors.stock.textContent = 'Valid stock quantity is required';
         isValid = false;
     }
-    if(isNaN(stockNum)){
+    if(isNaN(stock)){
         errors.stock.textContent = 'Stock must be a number';
-        isValid = alse;
+        isValid = false;
     }
     // Validate description
     const description = document.getElementById('description').value;
@@ -365,7 +383,6 @@ function renderTable() {
         const row = document.createElement('tr');
         console.log("product:",product);
         row.innerHTML = `
-        <tr>
             <td>${product.pid}</td>
             <td>${product.name}</td>
             <td>${categoryName}</td>
@@ -383,10 +400,9 @@ function renderTable() {
                 <button class="btn btn-edit" onclick="editProduct(${product.pid})">Edit</button>
                 <button class="btn btn-delete" onclick="confirmDelete(${product.pid})">Delete</button>
             </td>
-        </tr>
-    `;
-    tbody.appendChild(row);
-});
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

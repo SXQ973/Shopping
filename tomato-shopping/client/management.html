@@ -5,6 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Management Dashboard</title>
     <link rel="stylesheet" href="css/management.css">
+    <style>
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s forwards;
+        }
+
+        .notification.success {
+            background-color: #4CAF50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>Product Management Dashboard</h1>
@@ -62,6 +95,10 @@
             <button id="cancelDeleteBtn" class="btn btn-close">Cancel</button>
         </div>
     </div>
+    
+    <!-- 添加通知元素 -->
+    <div class="notification" id="notification"></div>
+    
     <script src = "js/management.js"></script>
 </body>
 </html>

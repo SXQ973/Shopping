@@ -3,44 +3,40 @@ var express = require('express');
 var router = express.Router();
 const db = require('../config/db');
 
-// Get products by category from database
+// Get products from database
 router.get('/products', (req, res) => {
     console.log("router.get: req.query.cateid:",req.query.cateid);
-    const cateid = parseInt(req.query.cateid, 10);
-    // Verify if cateid is valid
-    if (isNaN(cateid) || cateid <= 0) {
+    const cateid = req.query.cateid ? parseInt(req.query.cateid, 10) : null;
+     // if cateid==nullor1, return all products
+     if (cateid === null || cateid === 1) {
+        console.log("Getting all products");
+        let sql = 'SELECT * FROM products';
+        db.query(sql, (err, results) => {
+            if(err) {
+                console.error("❌ Database error:", err);
+                return res.status(500).json({ error: "Database query error" });
+            }
+            return res.json(results);
+        });
+    }
+    //if cateif !=0 and 1, return products of corresponding category
+    else if (cateid > 1) {
+        console.log("Getting products for category:", cateid);
+        db.query("SELECT * FROM products WHERE cateid = ?", [cateid], (err, results) => {
+            if (err) {
+                console.error("❌ Failed to query:", err);
+                return res.status(500).json({ error: "Database query error" });
+            }
+            return res.json(results);
+        });
+    }
+    // if cateid is invalid, return error
+    else {
         return res.status(400).json({ 
             status: 'error', 
             message: 'Invalid category ID' 
         });
     }
-    else if(cateid === 1){
-        let sql = 'SELECT * FROM products';
-        let query = db.query(sql, (err, results) => {
-            if(err) throw err;
-            res.json(results);
-        });
-    }
-    else{
-        // Query products by category (Avoid SQL Injection)
-        db.query("SELECT * FROM products WHERE cateid = ?", [cateid], (err, results) => {
-            console.log("router.get: results:",results);
-            if (err) {
-                console.error("❌ Failed to query:", err);
-                return res.status(500).json({ error: "Database query error" });
-            }
-            res.json(results);
-        });
-    }
-});
-
-// Get all the products from database
-router.get('/products', (req, res) => {
-    let sql = 'SELECT * FROM products';
-    let query = db.query(sql, (err, results) => {
-        if(err) throw err;
-        res.json(results);
-    });
 });
 
 // Get all the categories from database

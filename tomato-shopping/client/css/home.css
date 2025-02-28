@@ -384,10 +384,10 @@ h1, h2, h3 {
   display: flex;
   margin: 20px;
   gap: 20px;
-  align-items: flex-start; /* 确保顶部对齐 */
+  align-items: flex-start; 
 }
 
-/* Left categories - MODIFIED FOR STICKY BEHAVIOR */
+/* Left categories */
 .categories {
   width: 250px;
   background: white;
@@ -395,11 +395,11 @@ h1, h2, h3 {
   border-radius: 8px;
   padding: 10px;
   flex-shrink: 0;
-  position: sticky; /* 关键属性：使元素粘性定位 */
-  top: 70px; /* 导航栏下方20px位置 */
-  height: fit-content; /* 适应内容高度 */
-  max-height: calc(100vh - 90px); /* 最大高度为视口高度减去导航栏和间距 */
-  overflow-y: auto; /* 如果类别很多允许滚动 */
+  position: sticky; 
+  top: 70px; 
+  height: fit-content; 
+  max-height: calc(100vh - 90px); 
+  overflow-y: auto;
 }
 
 .categories h2 {
@@ -767,7 +767,7 @@ h1, h2, h3 {
   .categories {
     width: 100%;
     margin-bottom: 20px;
-    position: static; /* 移动设备上不使用粘性定位 */
+    position: static; 
     max-height: none;
   }
   

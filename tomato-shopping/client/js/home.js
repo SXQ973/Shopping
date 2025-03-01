@@ -3,7 +3,7 @@ let categoriesData = [];
 let productsData = {};
 let currentCategory = 1;
 let currentProduct = null;
-const API_URL = 'http://43.199.184.100';
+const API_URL = 'http://18.166.114.122';
 let cart = {
   items: [],
   total: 0

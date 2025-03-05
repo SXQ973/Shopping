@@ -10,7 +10,7 @@ const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
 const notification = document.getElementById('notification');
 
-const API_URL = 'http://18.166.114.122';
+const API_URL = 'http://43.199.184.100';
 let products = [];
 let categories = [];
 let editingProductId = null;

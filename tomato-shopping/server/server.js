@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const productRoutes = require('./routes/product');
-require('dotenv').config();  // load environment variables
+require('dotenv').config({ path: '/home/ubuntu/Shopping/tomato-shopping/.env' }); // load environment variables
 
 const app = express();
 
@@ -19,7 +19,10 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(express.static(path.join(__dirname, "../client"))); // Serve static files from the client folder
 app.use(productRoutes); 
-
+app.use((err, req, res, next) => {
+    console.error("Server Error:", err);
+    res.status(500).send("Internal Server Error");
+});
 app.listen(process.env.PORT,() =>{
     console.log('Server is running at'+process.env.HOST_URL);
 });

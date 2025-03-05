@@ -3,7 +3,7 @@ let categoriesData = [];
 let productsData = {};
 let currentCategory = 1;
 let currentProduct = null;
-const API_URL = 'http://18.166.114.122';
+const API_URL = 'http://43.199.184.100';
 let cart = {
   items: [],
   total: 0
@@ -21,6 +21,8 @@ const cartElement = document.getElementById('cart');
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
   try {
+    // Load cart from localStorage
+    loadCartFromLocalStorage();
     // Fetch categories from "backend"
     await fetchCategories();
     console.log("Category data already loaded:", categoriesData);
@@ -38,6 +40,34 @@ document.addEventListener('DOMContentLoaded', async function() {
     showError('Failed to load initial data. Please refresh the page.');
   }
 });
+
+// Load cart data from local storge
+function loadCartFromLocalStorage() {
+  try {
+    const savedCart = localStorage.getItem('shoppingCart');
+    if (savedCart) {
+      cart = JSON.parse(savedCart);
+      updateCartUI();
+    }
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error);
+    // If error, clear the cart
+    cart = {
+      items: [],
+      total: 0
+    };
+  }
+}
+
+// Save cart data to local storge
+function saveCartToLocalStorage() {
+  try {
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+  } catch (error) {
+    console.error('Error saving cart to localStorage:', error);
+  }
+}
+
 
 // Fetch categories from backend
 async function fetchCategories() {
@@ -384,10 +414,12 @@ function addToCart(product) {
    updateCartTotal();
    // Update cart UI
    updateCartUI();
+   // Save new data to local storge
+   saveCartToLocalStorage();
    // Show notification
    showCartNotification();
  }
- 
+ //
  // Add to cart from detail page
  function addToCartFromDetail() {
    if (!currentProduct) return;
@@ -409,13 +441,12 @@ function addToCart(product) {
        image: currentProduct.imageUrl
      });
    }
-   
    // Recalculate total
    updateCartTotal();
-   
    // Update cart UI
    updateCartUI();
-   
+  // Save new data to local storge
+  saveCartToLocalStorage();
    // Show notification
    showCartNotification();
  }
@@ -430,6 +461,7 @@ function addToCart(product) {
    item.quantity = newQuantity;
    updateCartTotal();
    updateCartUI();
+   saveCartToLocalStorage();
  }
  
  // ADDED: Remove item from cart
@@ -440,11 +472,22 @@ function addToCart(product) {
    cart.items.splice(itemIndex, 1);
    updateCartTotal();
    updateCartUI();
+   saveCartToLocalStorage();
    // Show notification
    cartNotification.textContent = "Item removed from cart";
    cartNotification.style.backgroundColor = "#ff5000";
    showCartNotification();
  }
+ // clear cart data
+ function clearCart() {
+  cart.items = [];
+  updateCartTotal();
+  updateCartUI();
+  saveCartToLocalStorage();
+  cartNotification.textContent = "Cart cleared";
+  cartNotification.style.backgroundColor = "#ff5000";
+  showCartNotification();
+}
  
  // Increase quantity
  function increaseQuantity() {
@@ -473,13 +516,16 @@ function addToCart(product) {
  function updateCartUI() {
    // Update total
    cartTotalElement.textContent = cart.total.toFixed(2);
-   
    // Update items
    cartItemsElement.innerHTML = '';
-   
    if (cart.items.length === 0) {
      cartItemsElement.innerHTML = '<div class="empty-cart-message">Your cart is empty</div>';
    } else {
+    // Button for clear the cart
+    const clearButton = document.createElement('div');
+    clearButton.className = 'clear-cart-button';
+    clearButton.innerHTML = '<button onclick="clearCart()">Clear Cart</button>';
+    cartItemsElement.appendChild(clearButton);
      // Show all items
      cart.items.forEach(item => {
        const li = document.createElement('li');
@@ -513,7 +559,6 @@ function addToCart(product) {
  // Show cart notification
  function showCartNotification() {
    cartNotification.style.display = 'block';
-   
    // Hide after 3 seconds
    setTimeout(() => {
      cartNotification.style.display = 'none';
@@ -527,7 +572,6 @@ function addToCart(product) {
    const errorDiv = document.createElement('div');
    errorDiv.className = 'error-message';
    errorDiv.textContent = message;
-   
    // Replace content with error message
    productsGrid.innerHTML = '';
    productsGrid.appendChild(errorDiv);

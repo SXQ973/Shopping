@@ -3,7 +3,7 @@ let categoriesData = [];
 let productsData = {};
 let currentCategory = 1;
 let currentProduct = null;
-const API_URL = 'http://43.199.184.100';
+const API_URL = 'http://127.0.0.1:5500';
 let cart = {
   items: [],
   total: 0
@@ -17,6 +17,7 @@ const cartTotalElement = document.getElementById('cart-total');
 const cartItemsElement = document.getElementById('cart-items');
 const cartNotification = document.getElementById('cart-notification');
 const cartElement = document.getElementById('cart');
+const notification = document.getElementById('notification');
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
@@ -35,6 +36,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupCarousel();
     // Setup cart
     setupCart();
+    // Setup account
+    setupAccount();
   } catch (error) {
     console.error('Initialization error:', error);
     showError('Failed to load initial data. Please refresh the page.');
@@ -621,5 +624,125 @@ function setupCarousel() {
         indicator.classList.remove('active');
       }
     });
+  }
+}
+
+
+// Setup account
+function setupAccount() {
+  // Get DOM elements
+  const accountLink = document.querySelector('.account-link');
+  const accountWindow = document.querySelector('.account-window');
+  
+  // Initialize windows state
+  accountWindow.style.display = 'none';
+
+  // Update account window content
+  function updateAccountWindow() {
+      const userEmail = localStorage.getItem('userEmail');
+      if (!userEmail) {
+          window.location.href = 'login.html';
+          return;
+      }
+
+      accountWindow.innerHTML = `
+          <div class="account-popup">
+              <div class="account-status">
+                  <span class="status-dot"></span>
+                  <span>Online</span>
+              </div>
+              <div class="account-email">
+                  <span>${userEmail}</span>
+              </div>
+              <div class="account-actions">
+                  <button class="btn-change-password">
+                      Change Password
+                  </button>
+                  <button class="btn-logout">
+                      Logout
+                  </button>
+              </div>
+          </div>
+      `;
+
+      // Add event listeners to buttons
+      const changePasswordBtn = accountWindow.querySelector('.btn-change-password');
+      const logoutBtn = accountWindow.querySelector('.btn-logout');
+
+      changePasswordBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          accountWindow.style.display = 'none';
+          window.location.href = '/change-password';  // Redirect to change password page
+      });
+
+      logoutBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showConfirmationDialog('Are you sure you want to logout?', logout);
+      });
+  }
+
+  // Toggle account window
+  accountLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const isVisible = accountWindow.style.display === 'block';
+      accountWindow.style.display = isVisible ? 'none' : 'block';
+      if (!isVisible) {
+          updateAccountWindow();
+      }
+  });
+
+  // Close window when clicking outside
+  document.addEventListener('click', function(e) {
+      if (accountWindow && !accountWindow.contains(e.target) && !accountLink.contains(e.target)) {
+          accountWindow.style.display = 'none';
+      }
+  });
+
+  // Logout function
+  async function logout() {
+      try {
+          const response = await fetch(`${API_URL}/logout`, {
+              method: 'POST',
+              credentials: 'include'
+          });
+
+          if (response.ok) {
+              localStorage.removeItem('userEmail');
+              showNotification('Logout successful!');
+              setTimeout(() => {
+                  window.location.href = 'login.html';
+              }, 1500);
+          } else {
+              showNotification('Logout failed. Please try again.', true);
+          }
+      } catch (error) {
+          console.error('Error during logout:', error);
+          showNotification('An error occurred during logout. Please try again.', true);
+      }
+  }
+
+  // Initial setup
+  updateAccountWindow();
+}
+
+// Show notifications
+function showNotification(message, isError = false) {
+  notification.textContent = message;
+  notification.style.backgroundColor = isError ? "#ff5000" : "#4CAF50";
+  notification.style.display = 'block';
+  // Hide after 3s
+  setTimeout(() => {
+      notification.style.display = 'none';
+      // reset color
+      notification.style.backgroundColor = "#4CAF50";
+  }, 3000);
+}
+
+function showConfirmationDialog(message, onConfirm) {
+  const confirmed = window.confirm(message);
+  if (confirmed) {
+      onConfirm();
   }
 }

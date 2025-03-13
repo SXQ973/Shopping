@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Management Dashboard</title>
-    <link rel="stylesheet" href="css/management.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="css/admin.css">
     <style>
         .notification {
             position: fixed;
@@ -62,6 +63,7 @@
         </table>
     </div>
     <div id="productModal" class="modal">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <h2 id="modalTitle">Add Product</h2>
         <input type="text" id="name" placeholder="Product Name" required>
         <div id="nameError" class="error-message"></div>
@@ -95,10 +97,8 @@
             <button id="cancelDeleteBtn" class="btn btn-close">Cancel</button>
         </div>
     </div>
-    
-    <!-- 添加通知元素 -->
     <div class="notification" id="notification"></div>
     
-    <script src = "js/management.js"></script>
+    <script src = "js/admin.js"></script>
 </body>
 </html>

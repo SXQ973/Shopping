@@ -10,7 +10,7 @@ const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
 const notification = document.getElementById('notification');
 
-const API_URL = 'http://43.199.184.100';
+const API_URL = 'http://127.0.0.1:5500';
 let products = [];
 let categories = [];
 let editingProductId = null;
@@ -23,7 +23,6 @@ function showNotification(message, isSuccess = true) {
     notification.className = 'notification';
     notification.classList.add(isSuccess ? 'success' : 'error');
     notification.style.display = 'block';
-    
     // Last for 3 seconds
     setTimeout(() => {
         notification.style.display = 'none';
@@ -41,6 +40,7 @@ async function fetchProducts() {
     try {
         const response = await fetch(`${API_URL}/products`, {
             method: 'GET',
+            credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ async function fetchProducts() {
         }
         
         const data = await response.json();
-        // 对获取的数据按ID倒序排序
+        // sort by id dec
         products = sortProductsByIdDesc(data);
         renderTable();
     } catch (error) {
@@ -65,6 +65,7 @@ async function fetchProducts() {
 function fetchCategories() {
     fetch(`${API_URL}/categories`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -105,6 +106,7 @@ async function addProduct(productData) {
     try {
         const response = await fetch(`${API_URL}/products`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -144,6 +146,7 @@ async function sendUpdatedToServer(pid, productData) {
     try {
         const response = await fetch(`${API_URL}/products/${pid}`, {
             method: 'PUT',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -165,7 +168,8 @@ async function sendUpdatedToServer(pid, productData) {
 async function deleteProduct(id) {
     try {
         const response = await fetch(`${API_URL}/products/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         });
         
         if (!response.ok) throw new Error('Failed to delete product');

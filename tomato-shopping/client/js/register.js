@@ -1,21 +1,24 @@
 const API_URL = 'http://127.0.0.1:5500';
 
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
     const submitButton = document.getElementById('submitButton');
     const loader = document.getElementById('loader');
+    const passwordInput = document.getElementById('password');
+    const passwordStrength = document.querySelector('.password-strength');
     const notification = document.getElementById('notification');
     let csrfToken = null;
 
-    // Fetch CSRF token 
+    // Fetch CSRF token
     async function fetchCsrfToken() {
         try {
             const response = await fetch(`${API_URL}/csrf-token`);
             const data = await response.json();
+            console.log("data.token: ", data.token);
             csrfToken = data.token;
             document.getElementById('csrfToken').value = csrfToken;
         } catch (error) {
-            showError('Failed to initialize security features. Please refresh the page.');
+            showNotification('Failed to initialize security features. Please refresh the page.', false);
         }
     }
 
@@ -31,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // show notification
     function showNotification(message, isError = false) {
         notification.textContent = message;
         notification.style.backgroundColor = isError ? "#ff5000" : "#4CAF50";
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // clear error messages
+    // Clear error messages
     function clearErrors() {
         const errorElements = document.querySelectorAll('.error-message');
         errorElements.forEach(element => {
@@ -53,10 +55,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validate email and password
-    function validateForm(email, password) {
+    // Check password strength
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        return strength;
+    }
+
+    // Update password strength indicator
+    function updatePasswordStrength(password) {
+        const strength = checkPasswordStrength(password);
+        
+        passwordStrength.className = 'password-strength';
+        if (strength < 3) {
+            passwordStrength.classList.add('strength-weak');
+        } else if (strength < 5) {
+            passwordStrength.classList.add('strength-medium');
+        } else {
+            passwordStrength.classList.add('strength-strong');
+        }
+    }
+
+    // Validate form
+    function validateForm(email, password, confirmPassword) {
         let isValid = true;
         clearErrors();
+        // Validate email address
         if (!email) {
             showError('Email is required', 'email');
             isValid = false;
@@ -64,63 +92,77 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Please enter a valid email address', 'email');
             isValid = false;
         }
+        // Validate password strength
         if (!password) {
             showError('Password is required', 'password');
+            isValid = false;
+        } else if (checkPasswordStrength(password) < 5) {
+            showError('Password does not meet security requirements', 'password');
+            isValid = false;
+        }
+        // Confirm password
+        if (password !== confirmPassword) {
+            showError('Passwords do not match', 'confirmPassword');
             isValid = false;
         }
         return isValid;
     }
 
-    // Handle log in
-    async function handleLogin(email, password) {
+    // Handle resigter
+    async function handleRegister(email, password) {
         loader.style.display = 'block';
         submitButton.disabled = true;
-
+        //const token = await fetchCsrfToken();
         try {
-            const response = await fetch(`${API_URL}/login`, {
+            const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-Token': csrfToken
                 },
+                credentials: 'include', 
                 body: JSON.stringify({ email, password, csrf_token: csrfToken })
             });
-
             const data = await response.json();
-
+            console.log("data", data);
             if (response.ok) {
-                if (data.redirect) {
-                    // Store user email to local storge
-                    localStorage.setItem('userEmail', email);
-                    // redirect to index.html
-                    window.location.href = data.redirect;
-                }
+                // Show success and redirect to login page
+                showNotification('Registration successful! Redirecting to login page...', false);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
             } else {
-                showError(data.error || 'Login failed');
-                // 如果是CSRF错误，刷新token
+                console.log("Why???????? registration failed?")
+                showNotification(data.error || 'Registration failed', true);
+                // if csrf error, renew token
                 if (response.status === 403) {
                     await fetchCsrfToken();
                 }
             }
         } catch (error) {
-            showNotification('An unexpected error occurred. Please try again.', true);
+            showNotification('An unexpected error occurred. Please try again.'+error.message, true);
         } finally {
             loader.style.display = 'none';
             submitButton.disabled = false;
         }
     }
 
-    // Click on submit form
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // listen on password input
+    passwordInput.addEventListener('input', function() {
+        updatePasswordStrength(this.value);
+    });
 
+    // Click on submit
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-
-        if (validateForm(email, password)) {
-            await handleLogin(email, password);
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (validateForm(email, password, confirmPassword)) {
+            await handleRegister(email, password);
         }
     });
+
     // Initialize CSRF token
     fetchCsrfToken();
 });

@@ -4,15 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tomato Shopping Homepage</title>
-  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
+  <!-- notifications-->
+  <div class="notification" id="notification">
+    <!-- Notification will be dynamically set by js -->
+  </div>
   <!-- Top banner -->
   <div class="navbar">
     <div class="logo" onclick="showHomePage()">Tomato Shopping</div>
     <div class="links">
       <a href="#" onclick="showHomePage()">Home</a>
-      <a href="#">My Account</a>
+      <!-- Account window -->
+      <a href="#" class="account-link">My Account</a>
+      <div class="account-window" id="account-window">
+        <!-- Content will be dynamically generated -->
+      </div>
+      <!-- Cart window -->
       <div class="cart" id="cart">
         Cart
         <div class="cart-window">
@@ -29,7 +39,6 @@
       </div>
     </div>
   </div>
-
   <!-- Carousel -->
   <div class="carousel">
     <div class="carousel-images" id="carousel-images">
@@ -97,10 +106,11 @@
       </div>
     </div>
   </div>
+
   <!-- Footer -->
   <div class="footer">
     © 2025 Tomato. All rights reserved.
   </div>
-  <script src = "js/home.js"></script>
+  <script src = "js/index.js"></script>
 </body>
 </html>

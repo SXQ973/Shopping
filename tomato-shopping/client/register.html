@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Secure System</title>
+    <title>Register - Secure System</title>
     <link rel="stylesheet" href="css/logreg.css">
 </head>
 <body>
     <!-- notifications-->
     <div class="notification" id="notification">
-    <!-- Notification will be dynamically set by js -->
+        <!-- Notification will be dynamically set by js -->
     </div>
     <div class="container">
         <div class="form-container fade-in">
-            <h2>Login</h2>
-            <form id="loginForm" novalidate>
+            <h2>Register</h2>
+            <form id="registerForm" novalidate>
                 <input type="hidden" name="csrf_token" id="csrfToken">
                 
                 <div class="form-group">
@@ -27,21 +27,33 @@
                 <div class="form-group">
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required
-                           autocomplete="current-password">
+                           autocomplete="new-password">
+                    <div class="password-strength"></div>
+                    <div class="form-text">
+                        Password must contain at least 8 characters, including uppercase, 
+                        lowercase, number and special character
+                    </div>
                     <div class="error-message" data-error="password"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" 
+                           required autocomplete="new-password">
+                    <div class="error-message" data-error="confirmPassword"></div>
                 </div>
 
                 <div class="error-message" id="generalError"></div>
                 <div class="loader" id="loader"></div>
 
-                <button type="submit" id="submitButton">Login</button>
+                <button type="submit" id="submitButton">Register</button>
             </form>
 
             <div class="links">
-                <p>Don't have an account? <a href="/register">Register</a></p>
+                <p>Already have an account? <a href="/login">Login</a></p>
             </div>
         </div>
     </div>
-    <script nonce="{{nonce}}" src="js/login.js"></script>
+    <script nonce="{{nonce}}" src="js/register.js"></script>
 </body>
 </html>

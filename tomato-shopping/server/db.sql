@@ -1,9 +1,40 @@
 -- Create Database
-CREATE DATABASE IF NOT EXISTS SHOPPING;
+DROP DATABASE IF EXISTS SHOPPING;
+CREATE DATABASE SHOPPING;
 USE SHOPPING;
 
+-- Create Users Table
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    isAdmin BOOLEAN DEFAULT FALSE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- Insert admin and user
+INSERT INTO users (email, password, isAdmin) VALUES
+('admin@example.com', '$2b$12$1JNR0nXhymr5MIM2Vln69eUDjwxbggrcYAP3DI.LNYBMNDG1UWC9q', TRUE),
+('user@example.com', '$2b$12$q8ql97OhwRzYGmrvwFID1ONm9bdNdiCKL5TFeRFXgTIp835xMYAC6', false);
+
+-- Create sessions table for secure session management
+CREATE TABLE sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    session_id VARCHAR(128) NOT NULL,
+    user_id INT NOT NULL,
+    expires TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Create csrf token table
+CREATE TABLE csrf_tokens (
+    token VARCHAR(128) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires TIMESTAMP NOT NULL,
+    INDEX idx_expires (expires)
+);
+
 -- Create Categories Table
-DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `cateid` int NOT NULL AUTO_INCREMENT,
   `name` varchar(512) NOT NULL,
@@ -36,7 +67,6 @@ LOCK TABLES `categories` WRITE;
 UNLOCK TABLES;
 
 -- Create Products Table
-DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `pid` int NOT NULL AUTO_INCREMENT,
   `cateid` int DEFAULT NULL,
@@ -48,6 +78,7 @@ CREATE TABLE `products` (
   `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`pid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci AUTO_INCREMENT=1;
+
 -- Electronics
 INSERT INTO products SET 
     cateid = 1,

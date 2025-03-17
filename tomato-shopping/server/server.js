@@ -36,7 +36,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // CORS Configuration
 app.use(cors({
-    origin:['http://43.199.184.100:5500','http://s27.iems5718.ie.cuhk.edu.hk'],
+    origin:['http://43.199.184.100','http://s27.iems5718.ie.cuhk.edu.hk'],
     allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'Origin'],
     credentials: true // Allow credentials (cookies, authorization headers)
 }));
@@ -83,6 +83,7 @@ app.use(express.static('client', {
         }
     }
 }));
+
 app.use(pageRoutes);
 app.use(authRoutes);
 app.use(productRoutes);

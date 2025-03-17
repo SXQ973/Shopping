@@ -50,7 +50,7 @@ function sortProductsByIdDesc(productsArray) {
 
 // ProductList: Load products from the server
 async function fetchProducts() {
-    console.log(`${API_URL}/products`);
+    console.log('/api/products');
     try {
         const response = await fetch('/api/products', {
             method: 'GET',

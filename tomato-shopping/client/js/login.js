@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 showError(data.error || 'Login failed');
-                // 如果是CSRF错误，刷新token
+                // if csrf error, renew token
                 if (response.status === 403) {
                     await fetchCsrfToken();
                 }

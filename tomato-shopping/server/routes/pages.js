@@ -1,7 +1,6 @@
-// middleware/auth.js
 const SecurityUtils = require('../utils/security');
 const express = require('express');
-const path = require('path');
+const path = require('path'); 
 const pool = require('../config/db');
 const router = express.Router();
 
@@ -45,29 +44,21 @@ router.get('/', (req, res) => {
 
 // Login page
 router.get('/login', (req, res) => {
-    // if logged in, redirect to index page
-    if (req.signedCookies[process.env.SESSION_COOKIE_NAME]) {
-        return res.redirect('/index');
-    }
     res.sendFile(path.join(__dirname, '../../client/login.html'));
 });
 
 // Register page
 router.get('/register', (req, res) => {
-    // if logged in, redirect to index page
-    if (req.signedCookies[process.env.SESSION_COOKIE_NAME]) {
-        return res.redirect('/index');
-    }
     res.sendFile(path.join(__dirname, '../../client/register.html'));
 });
 
 // index page(main page)
-router.get('/index', checkAuth, (req, res) => {
+router.get('/index', (req, res) => {
     res.sendFile(path.join(__dirname, '../../client/index.html'));
 });
 
 // Admin page
-router.get('/admin', checkAuth, checkAdmin, (req, res) => {
+router.get('/admin', checkAdmin, (req, res) => {
     res.sendFile(path.join(__dirname, '../../client/admin.html'));
 });
 

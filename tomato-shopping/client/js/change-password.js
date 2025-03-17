@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:5500';
+const API_URL = 'http://43.199.184.100:5500';
 
 document.addEventListener('DOMContentLoaded', function() {
     const changePasswordForm = document.getElementById('changePasswordForm');
@@ -89,12 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateForm(currentPassword, newPassword, confirmPassword) {
         let isValid = true;
         clearErrors();
-
         if (!currentPassword) {
             showError('Current password is required', 'currentPassword');
             isValid = false;
         }
-
         if (!newPassword) {
             showError('New password is required', 'newPassword');
             isValid = false;
@@ -102,17 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Password does not meet security requirements', 'newPassword');
             isValid = false;
         }
-
         if (newPassword === currentPassword) {
             showError('New password must be different from current password', 'newPassword');
             isValid = false;
         }
-
         if (newPassword !== confirmPassword) {
             showError('Passwords do not match', 'confirmPassword');
             isValid = false;
         }
-
         return isValid;
     }
 

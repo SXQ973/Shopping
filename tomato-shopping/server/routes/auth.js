@@ -4,6 +4,37 @@ const SecurityUtils = require('../utils/security');
 
 const router = express.Router();
 
+const validateCsrfToken = async(req, res, next) => {
+    // Skip CSRF validation for GET, HEAD, and OPTIONS requests
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+        return next();
+    }
+    try {
+        // Get CSRF token from headers
+        const token = req.headers['x-csrf-token'];
+        // Check if token is present
+        if (!token) {
+            return res.status(403).json({
+                error: 'CSRF token missing in headers'
+            });
+        }
+        // Check if token is valid
+        const [tokens] = await pool.execute(
+            'SELECT * FROM csrf_tokens WHERE token = ? AND expires > NOW()', 
+            [token]
+        );
+        if (tokens.length === 0) {
+            return res.status(403).json({ error: 'Invalid CSRF token' });
+        }
+        next();
+    } catch (error) {
+        console.error('CSRF Validation Error:', error);
+        return res.status(500).json({
+            error: 'CSRF validation failed'
+        });
+    }
+};
+
 // CSRF token generation
 router.get('/csrf-token', async (req, res) => {
     try {
@@ -14,7 +45,6 @@ router.get('/csrf-token', async (req, res) => {
             'INSERT INTO csrf_tokens (token, expires) VALUES (?, ?)',
             [token, expires]
         );
-
         res.json({ token });
     } catch (error) {
         console.error('CSRF token generation error:', error);
@@ -23,42 +53,27 @@ router.get('/csrf-token', async (req, res) => {
 });
 
 // User registration
-router.post('/register', async (req, res) => {
+router.post('/register', validateCsrfToken, async (req, res) => {
     try {
-        const { email, password, csrf_token } = SecurityUtils.sanitizeInput(req.body);
-
-        // 验证CSRF Token
-        const [tokens] = await pool.execute(
-            'SELECT * FROM csrf_tokens WHERE token = ? AND expires > NOW()', 
-            [csrf_token]
-        );
-
-        if (tokens.length === 0) {
-            return res.status(403).json({ error: 'Invalid CSRF token' });
-        }
-
-        // 验证输入
+        const { email, password} = SecurityUtils.sanitizeInput(req.body);
+        // validate email and password
         if (!SecurityUtils.isValidEmail(email) || !SecurityUtils.isValidPassword(password)) {
             return res.status(400).json({ error: 'Invalid input format' });
         }
-
-        // 检查邮箱是否已存在
+        // check if email is already registered
         const [existingUsers] = await pool.execute(
             'SELECT id FROM users WHERE email = ?',
             [email]
         );
-
         if (existingUsers.length > 0) {
             return res.status(400).json({ error: 'Email already registered' });
         }
-
-        // 哈希密码并创建用户
+        // hash password
         const hashedPassword = await SecurityUtils.hashPassword(password);
         await pool.execute(
             'INSERT INTO users (email, password) VALUES (?, ?)',
             [email, hashedPassword]
         );
-
         res.json({ success: true, message: 'Registration successful' });
     } catch (error) {
         console.error('Registration error:', error);
@@ -67,18 +82,9 @@ router.post('/register', async (req, res) => {
 });
 
 // Log in 
-router.post('/login', async (req, res) => {
+router.post('/login', validateCsrfToken, async (req, res) => {
     try {
-        const { email, password, csrf_token } = SecurityUtils.sanitizeInput(req.body);
-        // 验证CSRF Token
-        const [tokens] = await pool.execute(
-            'SELECT * FROM csrf_tokens WHERE token = ? AND expires > NOW()',
-            [csrf_token]
-        );
-        if (!tokens || tokens.length === 0) {
-            return res.status(403).json({ error: 'Invalid CSRF token' });
-        }
-        // 获取用户
+        const { email, password} = SecurityUtils.sanitizeInput(req.body);
         const [users] = await pool.execute(
             'SELECT * FROM users WHERE email = ?',
             [email]
@@ -88,8 +94,7 @@ router.post('/login', async (req, res) => {
         if (!user || !(await SecurityUtils.verifyPassword(password, user.password))) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-
-        // 创建会话
+        // Generate session id
         const sessionId = SecurityUtils.generateSessionId();
         const expires = new Date(Date.now() + parseInt(process.env.COOKIE_MAX_AGE));
 
@@ -97,8 +102,7 @@ router.post('/login', async (req, res) => {
             'INSERT INTO sessions (session_id, user_id, expires) VALUES (?, ?, ?)',
             [sessionId, user.id, expires]
         );
-
-        // 设置会话cookie
+        // Set session cookie
         res.cookie(process.env.SESSION_COOKIE_NAME, sessionId, {
             expires,
             httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
@@ -106,7 +110,6 @@ router.post('/login', async (req, res) => {
             sameSite: process.env.COOKIE_SAME_SITE,
             signed: true
         });
-
         res.json({
             success: true,
             redirect: user.is_admin ? '/admin' : '/index'
@@ -128,9 +131,8 @@ router.post('/logout', async (req, res) => {
                 [sessionId]
             );
         }
-
         res.clearCookie(process.env.SESSION_COOKIE_NAME);
-        res.json({ success: true, redirect: '/login' });
+        res.json({ success: true});
     } catch (error) {
         console.error('Logout error:', error);
         res.status(500).json({ error: 'Internal server error' });

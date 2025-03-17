@@ -66,11 +66,6 @@ h1, h2, h3 {
   cursor: pointer;
 }
 
-/* Remove hover effect */
-/* .navbar .links .cart:hover .cart-window {
-  display: block;
-} */
-
 .navbar .links .cart .cart-window {
   position: absolute;
   top: 120%;
@@ -97,7 +92,6 @@ h1, h2, h3 {
   border-bottom: 1px solid #eee;
 }
 
-/* MODIFIED - Improved cart item styling */
 .navbar .links .cart .cart-window ul li {
   padding: 12px 0;
   border-bottom: 1px solid #eee;
@@ -208,7 +202,7 @@ h1, h2, h3 {
 }
 
 /* Checkout Button */
-.navbar .links .cart .cart-window .checkout-btn {
+.navbar .links .cart .cart-window .checkout-btn{
   display: block;
   margin-top: 15px;
   background-color: #ff5000;
@@ -840,80 +834,113 @@ h1, h2, h3 {
 }
 
 /* Account window */
-.account-window {
-    position: absolute;
-    top: 60px;
-    right: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 300px;
-    z-index: 1000;
-    padding: 16px;
-    display: none;
+.navbar .links .account-link {
+  position: relative;
+  cursor: pointer;
 }
 
-.account-popup {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.navbar .links .account-link .account-window {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 280px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 10;
+  padding: 15px;
+  color: #333;
+}
+
+.navbar .links .account-link .account-window .account-email h4 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 15px;
+  color: black;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
 }
 
 .account-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-dot,
+.status-dot-inactive {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
-    background: #4CAF50;
-    border-radius: 50%;
+  background: #4CAF50;
 }
 
-.account-email {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-    color: #666;
+.status-dot-inactive {
+  background: #888;
 }
 
 .account-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.btn-change-password, 
-.btn-logout {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+.account-actions button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 .btn-change-password {
-    background: #007bff;
-    color: white;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .btn-change-password:hover {
-    background: #0056b3;
+  background: #e0e0e0;
 }
 
 .btn-logout {
-    background: #dc3545;
-    color: white;
+  background: #ff5000;
+  color: white;
 }
 
 .btn-logout:hover {
-    background: #c82333;
+  background: #e04800;
 }
 
+.btn-login {
+  display: block;
+  width: 100%;
+  background-color: #ff5000;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: #e04800;
+}
+
+/* error message */
 .error {
   color: #f44336;
   font-size: 14px;

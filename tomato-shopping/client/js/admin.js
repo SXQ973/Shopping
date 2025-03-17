@@ -10,12 +10,26 @@ const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
 const notification = document.getElementById('notification');
 
-const API_URL = 'http://127.0.0.1:5500';
+const API_URL = 'http://43.199.184.100:5500';
 let products = [];
 let categories = [];
 let editingProductId = null;
 let deletingProductId = null;
 let currentImage = null;
+
+let csrfToken = null;
+
+// Fetch CSRF token 
+async function fetchCsrfToken() {
+    try {
+        const response = await fetch(`${API_URL}/csrf-token`);
+        const data = await response.json();
+        csrfToken = data.token;
+        document.getElementById('csrfToken').value = csrfToken;
+    } catch (error) {
+        showError('Failed to initialize security features. Please refresh the page.');
+    }
+}
 
 // Show notifications
 function showNotification(message, isSuccess = true) {
@@ -109,6 +123,7 @@ async function addProduct(productData) {
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
             },
             body: JSON.stringify(productData)
         });

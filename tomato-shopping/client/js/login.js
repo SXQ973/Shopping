@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:5500';
+const API_URL = 'http://43.199.184.100:5500';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                     'X-CSRF-Token': csrfToken
                 },
-                body: JSON.stringify({ email, password, csrf_token: csrfToken })
+                credentials: 'include',
+                body: JSON.stringify({ email, password})
             });
 
             const data = await response.json();

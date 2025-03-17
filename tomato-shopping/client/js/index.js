@@ -3,7 +3,7 @@ let categoriesData = [];
 let productsData = {};
 let currentCategory = 1;
 let currentProduct = null;
-const API_URL = 'http://127.0.0.1:5500';
+const API_URL = 'http://43.199.184.100:5500';
 let cart = {
   items: [],
   total: 0
@@ -42,6 +42,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.error('Initialization error:', error);
     showError('Failed to load initial data. Please refresh the page.');
   }
+  const logo = document.getElementById('logo');
+  const homeLink = document.querySelector('.home-link');
+
+  logo.addEventListener('click', showHomePage);
+  homeLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showHomePage();
+  });
 });
 
 // Load cart data from local storge
@@ -225,12 +233,25 @@ async function showProductDetail(productId, cateid) {
     const detailBreadcrumb = document.createElement('nav');
     detailBreadcrumb.className = 'breadcrumb';
     detailBreadcrumb.innerHTML = `
-      <a href="#" onclick="showHomePage(); return false;">Home</a>
+      <a href="#" class="home-link">Home</a>
       <span>&gt;</span>
-      <a href="#" onclick="showCategoryPage(${cateid}); return false;">${getCategoryName(cateid)}</a>
+      <a href="#" class="category-link" data-cateid="${cateid}">${getCategoryName(cateid)}</a>
       <span>&gt;</span>
       <span>${product.name}</span>
     `;
+    const homeLink = detailBreadcrumb.querySelector('.home-link');
+    const categoryLink = detailBreadcrumb.querySelector('.category-link');
+
+    homeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showHomePage();
+    });
+
+    categoryLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cateid = e.target.dataset.cateid;
+      showCategoryPage(cateid);
+    });
 
     // Populate product detail
     const detailContent = document.createElement('div');
@@ -241,30 +262,38 @@ async function showProductDetail(productId, cateid) {
           <img src="${product.imageUrl}" alt="${product.name}">
         </div>
         <div class="product-detail-info">
-           <h1 class="product-detail-title">${product.name}</h1>
-           <div class="product-detail-price">$${product.price}</div>
-           <div class="product-detail-category">
-               <span class="detail-label">Category:</span>
-               <span class="detail-value">${getCategoryName(product.cateid)}</span>
-           </div>
-           <div class="product-detail-stock">
-               <span class="detail-label">Stock:</span>
-               <span class="detail-value">${product.stock} available</span>
-           </div>
-           <div class="product-detail-description">
+          <h1 class="product-detail-title">${product.name}</h1>
+          <div class="product-detail-price">$${product.price}</div>
+          <div class="product-detail-category">
+              <span class="detail-label">Category:</span>
+              <span class="detail-value">${getCategoryName(product.cateid)}</span>
+          </div>
+          <div class="product-detail-stock">
+              <span class="detail-label">Stock:</span>
+              <span class="detail-value">${product.stock} available</span>
+          </div>
+          <div class="product-detail-description">
             ${product.description || 'No description available.'}
           </div>
           <div class="product-detail-actions">
             <div class="product-detail-quantity">
-              <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+              <button class="quantity-btn decrease-quantity">-</button>
               <input type="text" value="1" class="quantity-input" id="quantity-input">
-              <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+              <button class="quantity-btn increase-quantity">+</button>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCartFromDetail()">Add to Cart</button>
+            <button class="add-to-cart-btn">Add to Cart</button>
           </div>
         </div>
       </div>
     `;
+    const decreaseBtn = detailContent.querySelector('.decrease-quantity');
+    const increaseBtn = detailContent.querySelector('.increase-quantity');
+    const addToCartBtn = detailContent.querySelector('.add-to-cart-btn');
+
+    decreaseBtn.addEventListener('click', decreaseQuantity);
+    increaseBtn.addEventListener('click', increaseQuantity);
+    addToCartBtn.addEventListener('click', addToCartFromDetail);
+
     productDetail.innerHTML = '';
     productDetail.appendChild(detailBreadcrumb);
     productDetail.appendChild(detailContent);
@@ -282,10 +311,15 @@ async function showHomePage() {
     const listingBreadcrumb = document.getElementById('breadcrumb');
     if (listingBreadcrumb) {
       listingBreadcrumb.innerHTML = `
-        <a href="#" onclick="showHomePage(); return false;">Home</a>
+        <a href="#" class="home-link">Home</a>
         <span>&gt;</span>
         <p id="current-category">All</p>
-      `;
+        `;
+      const homeLink = listingBreadcrumb.querySelector('.home-link');
+      homeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showHomePage();
+      });
     }
     
     const currentCategoryEl = document.getElementById('current-category');
@@ -308,10 +342,15 @@ async function showCategoryPage(category) {
     const listingBreadcrumb = document.getElementById('breadcrumb');
     if (listingBreadcrumb) {
       listingBreadcrumb.innerHTML = `
-        <a href="#" onclick="showHomePage(); return false;">Home</a>
+        <a href="#" class="home-link">Home</a>
         <span>&gt;</span>
         <p id="current-category">${getCategoryName(category)}</p>
       `;
+      const homeLink = listingBreadcrumb.querySelector('.home-link');
+      homeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showHomePage();
+      });
     }
     const currentCategoryEl = document.getElementById('current-category');
     if (currentCategoryEl) {
@@ -552,7 +591,6 @@ function addToCart(product) {
        cartItemsElement.appendChild(li);
      });
    }
-   
    // Update cart text
    if (cartElement) {
      cartElement.childNodes[0].nodeValue = `Cart $${cart.total.toFixed(2)} `;
@@ -635,50 +673,81 @@ function setupAccount() {
   const accountWindow = document.querySelector('.account-window');
   
   // Initialize windows state
-  accountWindow.style.display = 'none';
+  
+  if (accountLink) {
+    accountWindow.style.display = 'none';
+  }
 
   // Update account window content
   function updateAccountWindow() {
       const userEmail = localStorage.getItem('userEmail');
+      
+      // Show different content based on login status
       if (!userEmail) {
-          window.location.href = 'login.html';
-          return;
+          // Guest user view
+          accountWindow.innerHTML = `
+              <div class="account-popup">
+                  <div class="account-status">
+                      <span class="status-dot-inactive"></span>
+                      <div class="account-email">
+                        <h4>Guest</h4>
+                      </div>
+                  </div>
+                  <div class="account-actions">
+                      <button class="btn-login">
+                          Log in
+                      </button>
+                  </div>
+              </div>
+          `;
+          // Add event listener to login button
+          const loginBtn = accountWindow.querySelector('.btn-login');
+          loginBtn?.addEventListener('click', (e) => {
+              e.stopPropagation();
+              accountWindow.style.display = 'none';
+              window.location.href = 'login.html';
+          });
+      } else {
+          // Logged in user view
+          accountWindow.innerHTML = `
+              <div class="account-popup">
+                  <div class="account-status">
+                      <span class="status-dot"></span>
+                      <span>Online</span>
+                  </div>
+                  <div class="account-email">
+                      <h4>${userEmail}</h4>
+                  </div>
+                  <div class="account-actions">
+                      <button class="btn-change-password">
+                          Change Password
+                      </button>
+                      <button class="btn-logout">
+                          Logout
+                      </button>
+                  </div>
+              </div>
+          `;
+
+          // Add event listeners to buttons
+          const changePasswordBtn = accountWindow.querySelector('.btn-change-password');
+          const logoutBtn = accountWindow.querySelector('.btn-logout');
+          const loginBtn = accountWindow.querySelector('.btn-login');
+          changePasswordBtn?.addEventListener('click', (e) => {
+              e.stopPropagation();
+              accountWindow.style.display = 'none';
+              window.location.href = '/change-password';
+          });
+          logoutBtn?.addEventListener('click', (e) => {
+              e.stopPropagation();
+              showConfirmationDialog('Are you sure you want to logout?', logout);
+          });
+          loginBtn?.addEventListener('click', (e) => {
+              e.stopPropagation();
+              accountWindow.style.display = 'none';
+              window.location.href = '/login';
+          });
       }
-
-      accountWindow.innerHTML = `
-          <div class="account-popup">
-              <div class="account-status">
-                  <span class="status-dot"></span>
-                  <span>Online</span>
-              </div>
-              <div class="account-email">
-                  <span>${userEmail}</span>
-              </div>
-              <div class="account-actions">
-                  <button class="btn-change-password">
-                      Change Password
-                  </button>
-                  <button class="btn-logout">
-                      Logout
-                  </button>
-              </div>
-          </div>
-      `;
-
-      // Add event listeners to buttons
-      const changePasswordBtn = accountWindow.querySelector('.btn-change-password');
-      const logoutBtn = accountWindow.querySelector('.btn-logout');
-
-      changePasswordBtn?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          accountWindow.style.display = 'none';
-          window.location.href = '/change-password';  // Redirect to change password page
-      });
-
-      logoutBtn?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showConfirmationDialog('Are you sure you want to logout?', logout);
-      });
   }
 
   // Toggle account window
@@ -710,10 +779,10 @@ function setupAccount() {
 
           if (response.ok) {
               localStorage.removeItem('userEmail');
-              showNotification('Logout successful!');
-              setTimeout(() => {
-                  window.location.href = 'login.html';
-              }, 1500);
+              showNotification('Logout successful!', true);
+              // Update account window
+              updateAccountWindow();
+              accountWindow.style.display = 'none';
           } else {
               showNotification('Logout failed. Please try again.', true);
           }

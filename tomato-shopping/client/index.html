@@ -14,13 +14,14 @@
   </div>
   <!-- Top banner -->
   <div class="navbar">
-    <div class="logo" onclick="showHomePage()">Tomato Shopping</div>
+    <div class="logo" id="logo">Tomato Shopping</div>
     <div class="links">
-      <a href="#" onclick="showHomePage()">Home</a>
+      <a href="#" class="home-link">Home</a>
       <!-- Account window -->
-      <a href="#" class="account-link">My Account</a>
-      <div class="account-window" id="account-window">
-        <!-- Content will be dynamically generated -->
+      <div class="account-link" id = "account-link">My Account
+        <div class="account-window" id="account-window">
+          <!-- Content will be dynamically generated -->
+        </div>
       </div>
       <!-- Cart window -->
       <div class="cart" id="cart">
@@ -111,6 +112,6 @@
   <div class="footer">
     © 2025 Tomato. All rights reserved.
   </div>
-  <script src = "js/index.js"></script>
+  <script nonce="<%= nonce %>" src = "js/index.js"></script>
 </body>
 </html>

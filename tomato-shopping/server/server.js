@@ -28,10 +28,6 @@ const app = express();
 // Security Middleware
 app.use(helmet());
 
-// JSON and Cookie parsing middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
 // app.use(bodyParser.json({limit: '50mb'}));
 // // Size limit for URL-encoded data // Allow rich objects and arrays in URL-encoded format
 // app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
@@ -46,33 +42,22 @@ app.use(cors({
 }));
 
 // Session Configuration
-// app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     name: 'sessionId',  // Custom session cookie name
-//     resave: false,  // Don't save session if unmodified
-//     saveUninitialized: false,  // Don't create session until something stored
-//     cookie: {
-//         secure: false,  // Require HTTPS in production， for test, set false
-//         httpOnly: true,  // Prevent client-side access to cookie
-//         maxAge: 24 * 60 * 60 * 1000,  // 24 hours
-//         sameSite: 'lax'  // CSRF protection
-//     }
-// }));
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    name: 'sessionId',  // Custom session cookie name
+    resave: false,  // Don't save session if unmodified
+    saveUninitialized: false,  // Don't create session until something stored
+    cookie: {
+        secure: process.env.COOKIE_SECURE,  // Require HTTPS in production， for test, set false
+        httpOnly: process.env.COOKIE_HTTP_ONLY,  // Prevent client-side access to cookie
+        sameSite: process.env.COOKIE_SAME_SITE  // CSRF protection
+    }
+}));
 
-/*
-CSRF Protection: Protects against Cross-Site Request Forgery
-Double Submit pattern:
--- One stored in an httpOnly cookie (automatically sent)
--- One stored in a form or request header (which needs to be manually added)
-*/
-// app.use(csrf({
-//     cookie: {
-//         httpOnly: true,      // Avoid client side read js
-//         secure: false,  // 生产环境需要 HTTPS
-//   //      maxAge: 3600,        // cookie expire time
-//         sameSite: 'lax'   // CSRF protection
-//     }
-// }));
+// JSON and Cookie parsing middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
 // Config security header
 app.use((req, res, next) => {

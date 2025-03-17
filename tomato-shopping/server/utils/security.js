@@ -37,7 +37,7 @@ class SecurityUtils {
     // Generate CSP policy
     static generateCSP(nonce) {
         return `
-            default-src *;
+            default-src 'self';
             script-src * 'nonce-${nonce}';
             style-src *;
             img-src *;

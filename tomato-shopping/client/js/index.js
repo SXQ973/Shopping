@@ -3,7 +3,7 @@ let categoriesData = [];
 let productsData = {};
 let currentCategory = 1;
 let currentProduct = null;
-const API_URL = 'http://43.199.184.100:5500';
+//const API_URL = 'http://127.0.0.1:5500';
 let cart = {
   items: [],
   total: 0
@@ -85,7 +85,7 @@ async function fetchCategories() {
   try {
        // Show loading state
        categoriesList.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
-       fetch(`${API_URL}/categories`, {
+       fetch(`/api/categories`, {
            method: 'GET',
            headers: {
                'Accept': 'application/json',
@@ -140,7 +140,7 @@ async function fetchProductsByCategory(cateid) {
    }
    
    // Fetch products for this category
-   fetch(`${API_URL}/products?cateid=${cateid}`, {
+   fetch(`/api/products?cateid=${cateid}`, {
        method: 'GET',
        headers: {
            'Accept': 'application/json',
@@ -772,7 +772,7 @@ function setupAccount() {
   // Logout function
   async function logout() {
       try {
-          const response = await fetch(`${API_URL}/logout`, {
+          const response = await fetch(`/api/logout`, {
               method: 'POST',
               credentials: 'include'
           });

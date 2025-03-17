@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:5500';
+//const API_URL = 'http://127.0.0.1:5500';
 
 document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('registerForm');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch CSRF token
     async function fetchCsrfToken() {
         try {
-            const response = await fetch(`${API_URL}/csrf-token`);
+            const response = await fetch('/api/csrf-token');
             const data = await response.json();
             console.log("data.token: ", data.token);
             csrfToken = data.token;
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = true;
         //const token = await fetchCsrfToken();
         try {
-            const response = await fetch(`${API_URL}/register`, {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // CORS Configuration
 app.use(cors({
-    origin:['http://localhost:5500', 'http://127.0.0.1:5500'],
+    origin:['http://43.199.184.100:5500'],
     allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'Origin'],
     credentials: true // Allow credentials (cookies, authorization headers)
 }));

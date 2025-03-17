@@ -10,7 +10,7 @@ const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
 const notification = document.getElementById('notification');
 
-const API_URL = 'http://43.199.184.100:5500';
+// const API_URL = 'http://127.0.0.1:5500';
 let products = [];
 let categories = [];
 let editingProductId = null;
@@ -22,7 +22,7 @@ let csrfToken = null;
 // Fetch CSRF token 
 async function fetchCsrfToken() {
     try {
-        const response = await fetch(`${API_URL}/csrf-token`);
+        const response = await fetch('/api/csrf-token');
         const data = await response.json();
         csrfToken = data.token;
         document.getElementById('csrfToken').value = csrfToken;
@@ -52,7 +52,7 @@ function sortProductsByIdDesc(productsArray) {
 async function fetchProducts() {
     console.log(`${API_URL}/products`);
     try {
-        const response = await fetch(`${API_URL}/products`, {
+        const response = await fetch('/api/products', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -77,7 +77,7 @@ async function fetchProducts() {
 
 // Categories: Load categories from the server
 function fetchCategories() {
-    fetch(`${API_URL}/categories`, {
+    fetch('/api/categories', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -118,7 +118,7 @@ function populateCategoryDropdown() {
 //Add new products
 async function addProduct(productData) {
     try {
-        const response = await fetch(`${API_URL}/products`, {
+        const response = await fetch('/api/products', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -159,7 +159,7 @@ function editProduct(pid){
 async function sendUpdatedToServer(pid, productData) {
     console.log("sendUpdatedToServer: pid:",pid);
     try {
-        const response = await fetch(`${API_URL}/products/${pid}`, {
+        const response = await fetch(`/api/products/${pid}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -182,7 +182,7 @@ async function sendUpdatedToServer(pid, productData) {
 //Delete a product
 async function deleteProduct(id) {
     try {
-        const response = await fetch(`${API_URL}/products/${id}`, {
+        const response = await fetch(`/api/products/${id}`, {
             method: 'DELETE',
             credentials: 'include'
         });

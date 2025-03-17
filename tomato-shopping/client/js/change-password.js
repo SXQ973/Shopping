@@ -1,4 +1,4 @@
-const API_URL = 'http://43.199.184.100:5500';
+//const API_URL = 'http://127.0.0.1:5500';
 
 document.addEventListener('DOMContentLoaded', function() {
     const changePasswordForm = document.getElementById('changePasswordForm');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch CSRF token
     async function fetchCsrfToken() {
         try {
-            const response = await fetch(`${API_URL}/csrf-token`);
+            const response = await fetch('/api/csrf-token');
             const data = await response.json();
             csrfToken = data.token;
             document.getElementById('csrfToken').value = csrfToken;
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loader.style.display = 'block';
         submitButton.disabled = true;
         try {
-            const response = await fetch(`${API_URL}/change-password`, {
+            const response = await fetch('/api/change-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

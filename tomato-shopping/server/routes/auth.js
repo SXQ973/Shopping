@@ -102,14 +102,15 @@ router.post('/login', validateCsrfToken, async (req, res) => {
             [sessionId, user.id, expires]
         );
         // Set session user
-        res.session.user = { id: user.id, email: user.email, isAdmin: Boolean(user.isAdmin) };
+        req.session.user = { id: user.id, email: user.email, isAdmin: Boolean(user.isAdmin) };
         // Set session cookie
         res.cookie(process.env.SESSION_COOKIE_NAME, sessionId, {
             expires,
             httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
             secure: process.env.COOKIE_SECURE === 'true',
             sameSite: process.env.COOKIE_SAME_SITE,
-            signed: true
+            signed: true,
+            path: '/' // cookie path makes it accessible to all routes
         });
         
         res.json({

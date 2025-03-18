@@ -11,17 +11,13 @@ const checkAuth = (req, res, next) => {
         console.log("No session cookie found",sessionId);
         return res.redirect('/login');
     }
-    // check if req.user is set
-    if (!req.user) {
-        req.user = req.session.user || null;
-    }
-    next();
 };
 
 // Check admin middleware
 const checkAdmin = (req, res, next) => {
-    console.log("checkAdmin:req.user",req.user);
-    if (!req.user || !Boolean(req.user.isAdmin)) {
+    console.log("checkAdmin:req.session",req.session);
+    console.log("checkAdmin:req.session.user",req.session.user);
+    if (!req.session.user || !Boolean(req.session.user.isAdmin)) {
         return res.redirect('/login');
     }
     next();
@@ -64,7 +60,7 @@ router.get('/index', (req, res) => {
 });
 
 // Admin page
-router.get('/admin', checkAdmin, checkAuth,  (req, res) => {
+router.get('/admin', checkAuth, checkAdmin, (req, res) => {
     res.sendFile(path.join(__dirname, '../../client/admin.html'));
 });
 

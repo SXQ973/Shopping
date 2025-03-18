@@ -50,7 +50,8 @@ app.use(session({
     cookie: {
         secure: process.env.COOKIE_SECURE === 'true',  // Require HTTPS in production， for test, set false
         httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',  // Prevent client-side access to cookie
-        sameSite: process.env.COOKIE_SAME_SITE // CSRF protection
+        sameSite: process.env.COOKIE_SAME_SITE, // CSRF protection
+        path: '/'
     }
 }));
 

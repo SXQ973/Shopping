@@ -10,13 +10,11 @@ const imageInput = document.getElementById('imageInput');
 const uploadText = document.getElementById('uploadText');
 const notification = document.getElementById('notification');
 
-// const API_URL = 'http://127.0.0.1:5500';
 let products = [];
 let categories = [];
 let editingProductId = null;
 let deletingProductId = null;
 let currentImage = null;
-
 let csrfToken = null;
 
 // Fetch CSRF token 
@@ -36,10 +34,10 @@ function showNotification(message, isSuccess = true) {
     notification.textContent = message;
     notification.className = 'notification';
     notification.classList.add(isSuccess ? 'success' : 'error');
-    notification.style.display = 'block';
-    // Last for 3 seconds
+    notification.classList.add('notification-display-block');
     setTimeout(() => {
-        notification.style.display = 'none';
+        notification.classList.remove('notification-display-block');
+        notification.classList.add('notification-display-none');
     }, 3000);
 }
 
@@ -50,7 +48,6 @@ function sortProductsByIdDesc(productsArray) {
 
 // ProductList: Load products from the server
 async function fetchProducts() {
-    console.log('/api/products');
     try {
         const response = await fetch('/api/products', {
             method: 'GET',
@@ -62,15 +59,14 @@ async function fetchProducts() {
         });
         
         if (!response.ok) {
-            throw new Error('❌ Failed to fetch products');
+            throw new Error('Failed to fetch products');
         }
         
         const data = await response.json();
-        // sort by id dec
         products = sortProductsByIdDesc(data);
         renderTable();
     } catch (error) {
-        console.error('❌ Error fetching products:', error);
+        console.error('Error fetching products:', error);
         showNotification('Failed to fetch products', false);
     }
 }
@@ -87,7 +83,7 @@ function fetchCategories() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('❌ Failed to fetch categories');
+            throw new Error('Failed to fetch categories');
         }
         return response.json();
     })
@@ -99,7 +95,7 @@ function fetchCategories() {
         }
     })
     .catch(error => {
-        console.error('❌ Error fetching categories:', error);
+        console.error('Error fetching categories:', error);
         showNotification('Failed to fetch categories', false);
     });
 }
@@ -150,14 +146,12 @@ function editProduct(pid){
     currentImage = product.imageUrl;
     updateImagePreview();
     editingProductId = pid;
-    console.log("editingProductId:",editingProductId);
     modalTitle.textContent = "Edit Product";
-    productModal.style.display = "block";
+    productModal.classList.add('modal-display-block');
 }
 
 // Send update data to server
 async function sendUpdatedToServer(pid, productData) {
-    console.log("sendUpdatedToServer: pid:",pid);
     try {
         const response = await fetch(`/api/products/${pid}`, {
             method: 'PUT',
@@ -203,11 +197,10 @@ openModalBtn.addEventListener("click", () => {
     editingProductId = null;
     modalTitle.textContent = "Add Product";
     resetModalInputs();
-    console.log("categories",categories);
     if (categories.length === 0) {
         fetchCategories();
     }
-    productModal.style.display = "block";
+    productModal.classList.add('modal-display-block');
 });
 
 // Add product/Edit product: Handle form submission
@@ -222,26 +215,22 @@ submitProductBtn.addEventListener("click", async () => {
         imageUrl: currentImage
     };
     let success;
-    // CASE 1: Add product
     if (editingProductId === null) {
         success = await addProduct(productData);
-    } 
-    // CASE 2: Edit product
-    else {
-        console.log("editingProductId:",editingProductId);
+    } else {
         success = await sendUpdatedToServer(editingProductId, productData);
     }
     if (success) {
-        productModal.style.display = "none";
+        productModal.classList.remove('modal-display-block');
         resetModalInputs();
     }
 });
 
 // Close modals
-closeModalBtn.addEventListener("click", () => productModal.style.display = "none");
-cancelDeleteBtn.addEventListener("click", () => deleteModal.style.display = "none");
+closeModalBtn.addEventListener("click", () => productModal.classList.remove('modal-display-block'));
+cancelDeleteBtn.addEventListener("click", () => deleteModal.classList.remove('modal-display-block'));
 
-// Add product: Validate form inputs before submission
+// Form validation
 function validateForm() {
     let isValid = true;
     const errors = {
@@ -252,9 +241,9 @@ function validateForm() {
         description: document.getElementById('descriptionError'),
         image: document.getElementById('imageError')
     };
-    // Clear all previous error messages
+    
     Object.values(errors).forEach(error => error.textContent = '');
-    // Validate name
+    
     const name = document.getElementById('name').value;
     if (!name) {
         errors.name.textContent = 'Name is required';
@@ -263,12 +252,12 @@ function validateForm() {
         errors.name.textContent = 'Name cannot exceed 20 words';
         isValid = false;
     }
-    // Validate category
+    
     if (!document.getElementById('category').value) {
         errors.category.textContent = 'Category is required';
         isValid = false;
     }
-    // Validate price
+    
     const price = document.getElementById('price').value;
     const priceNum = parseFloat(price);
     if (!priceNum || priceNum < 0 || priceNum > 99999999.99) {
@@ -280,7 +269,6 @@ function validateForm() {
         isValid = false;
     }
     
-    // Validate stock quantity
     const stock = document.getElementById('stock').value;
     if (!stock || stock < 0 || stock > 4294967295) {
         errors.stock.textContent = 'Valid stock quantity is required';
@@ -290,7 +278,7 @@ function validateForm() {
         errors.stock.textContent = 'Stock must be a number';
         isValid = false;
     }
-    // Validate description
+    
     const description = document.getElementById('description').value;
     if (!description) {
         errors.description.textContent = 'Description is required';
@@ -299,7 +287,7 @@ function validateForm() {
         errors.description.textContent = 'Description cannot exceed 100 words';
         isValid = false;
     }
-    // Validate image
+    
     if (!currentImage) {
         errors.image.textContent = 'Image is required';
         isValid = false;
@@ -307,7 +295,7 @@ function validateForm() {
     return isValid;
 }
 
-// Reset modal form inputs and error messages
+// Reset form inputs
 function resetModalInputs() {
     document.getElementById("name").value = "";
     document.getElementById("category").value = "";
@@ -316,47 +304,26 @@ function resetModalInputs() {
     document.getElementById("description").value = "";
     currentImage = null;
     updateImagePreview();
-    // Reset error messages
     const errors = document.getElementsByClassName('error-message');
     Array.from(errors).forEach(error => error.textContent = '');
 }
 
-// Confirm product deletion
+// Confirm deletion
 confirmDeleteBtn.addEventListener("click", async () => {
     if (await deleteProduct(deletingProductId)) {
-        deleteModal.style.display = "none";
+        deleteModal.classList.remove('modal-display-block');
     }
 });
 
-// Delete product: Confirm product deletion
 function confirmDelete(id) {
     deletingProductId = id;
-    deleteModal.style.display = "block";
+    deleteModal.classList.add('modal-display-block');
 }
 
-//Image Operation: Image upload handling
+// Image handling
 imageInput.addEventListener('change', handleImageUpload);
 imagePreview.addEventListener('click', () => imageInput.click());
-imageInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            currentImage = e.target.result;
-            updateImagePreview();
-        };
-        reader.readAsDataURL(file);
-    }
-});
 
-// Image Operation: Open image in new tab when clicked
-function openImageInNewTab(imageData) {
-    const newWindow = window.open('');
-    newWindow.document.write(`<img src="${imageData}" style="max-width: 100%; height: auto;">`);
-    newWindow.document.title = 'Product Image';
-}
-
-// Image Operation: Update Image 
 function updateImagePreview() {
     if (currentImage) {
         imagePreview.innerHTML = `
@@ -365,14 +332,13 @@ function updateImagePreview() {
         `;
     } else {
         imagePreview.innerHTML = `
-            <input type="file" id="imageInput" accept="image/*" style="display: none">
+            <input type="file" id="imageInput" accept="image/*" class="hidden-input">
             <span id="uploadText">Click to upload image</span>
         `;
         document.getElementById('imageInput').addEventListener('change', handleImageUpload);
     }
 }
 
-// Image Operation: Handle image file upload
 function handleImageUpload(e) {
     const file = e.target.files[0];
     if (file) {
@@ -385,14 +351,29 @@ function handleImageUpload(e) {
     }
 }
 
-// Image Operation: Remove currently selected image
 function removeImage(event) {
     event.stopPropagation();
     currentImage = null;
     updateImagePreview();
 }
 
-// Render products table with current data
+function openImageInNewTab(imageData) {
+    const newWindow = window.open('');
+    newWindow.document.write(`
+        <html>
+            <head>
+                <title>Product Image</title>
+                <style>
+                    img { max-width: 100%; height: auto; }
+                </style>
+            </head>
+            <body>
+                <img src="${imageData}" alt="Product Image">
+            </body>
+        </html>
+    `);
+}
+
 function renderTable() {
     const tbody = document.querySelector('tbody');
     tbody.innerHTML = '';
@@ -400,7 +381,6 @@ function renderTable() {
         const category = categories.find(c => c.cateid === product.cateid);
         const categoryName = category ? category.name : 'Unknown Category';
         const row = document.createElement('tr');
-        console.log("product:",product);
         row.innerHTML = `
             <td>${product.pid}</td>
             <td>${product.name}</td>
@@ -411,8 +391,7 @@ function renderTable() {
             <td>
                 <img src="${product.imageUrl}" 
                      alt="${product.name}" 
-                     class="thumbnail"
-                     style="max-width: 50px;"
+                     class="thumbnail thumbnail-max-width"
                      onclick="openImageInNewTab('${product.imageUrl}')">
             </td>
             <td>

@@ -11,16 +11,35 @@ const checkAuth = (req, res, next) => {
         console.log("No session cookie found",sessionId);
         return res.redirect('/login');
     }
+    next();
 };
 
 // Check admin middleware
-const checkAdmin = (req, res, next) => {
-    console.log("checkAdmin:req.session",req.session);
-    console.log("checkAdmin:req.session.user",req.session.user);
-    if (!req.session.user || !Boolean(req.session.user.isAdmin)) {
+const checkAdmin = async(req, res, next) => {
+    console.log("checkAdmin:req.signedCookies",req.signedCookies);
+    const sessionId = req.signedCookies[process.env.SESSION_COOKIE_NAME];
+    const [sessions] = await pool.execute(
+        'SELECT * FROM sessions WHERE session_id = ? AND expires > NOW()',
+        [sessionId]
+    );
+    if (!sessions.length){
+        console.log("No session found",sessions);
         return res.redirect('/login');
     }
-    next();
+    //fetch user information
+    const [users] = await pool.execute(
+        'SELECT id, email, isAdmin FROM users WHERE id = ?',
+        [sessions[0].user_id]
+    );
+    if (!users.length){
+        console.log("No user found",users);
+        return res.redirect('/login');
+    }
+    const user = users[0];
+    if (!user || !Boolean(user.isAdmin)) {
+        return res.redirect('/login');
+    }
+    next()
 };
 
 // Add security headers for every html requests

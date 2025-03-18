@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ email, password})
             });
             const data = await response.json();
-            console.log("login.js:data",data)
+            //console.log("login.js:data",data)
+            console.log("login.js:data.redirect",data.redirect);
             if (response.ok) {
                 if (data.redirect) {
                     // Store user email to local storge

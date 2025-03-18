@@ -89,7 +89,6 @@ router.post('/login', validateCsrfToken, async (req, res) => {
             'SELECT * FROM users WHERE email = ?',
             [email]
         );
-
         const user = users[0];
         if (!user || !(await SecurityUtils.verifyPassword(password, user.password))) {
             return res.status(401).json({ error: 'Invalid email or password' });
@@ -102,6 +101,8 @@ router.post('/login', validateCsrfToken, async (req, res) => {
             'INSERT INTO sessions (session_id, user_id, expires) VALUES (?, ?, ?)',
             [sessionId, user.id, expires]
         );
+        // Set session user
+        res.session.user = { id: user.id, email: user.email, isAdmin: Boolean(user.isAdmin) };
         // Set session cookie
         res.cookie(process.env.SESSION_COOKIE_NAME, sessionId, {
             expires,
@@ -110,12 +111,13 @@ router.post('/login', validateCsrfToken, async (req, res) => {
             sameSite: process.env.COOKIE_SAME_SITE,
             signed: true
         });
+        
         res.json({
             success: true,
             redirect: Boolean(user.isAdmin)? '/admin' : '/index'
         });
         console.log("auth.js:login:redirect:",Boolean(user.isAdmin)? '/admin' : '/index');
-        console.log("auth.js:login:res",res);
+      //  console.log("auth.js:login:res",res);
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });

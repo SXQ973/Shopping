@@ -11,13 +11,17 @@ const checkAuth = (req, res, next) => {
         console.log("No session cookie found",sessionId);
         return res.redirect('/login');
     }
+    // check if req.user is set
+    if (!req.user) {
+        req.user = req.session.user || null;
+    }
     next();
 };
 
 // Check admin middleware
 const checkAdmin = (req, res, next) => {
     console.log("checkAdmin:req.user",req.user);
-    if (!req.user || !req.user.isAdmin) {
+    if (!req.user || !Boolean(req.user.isAdmin)) {
         return res.redirect('/login');
     }
     next();

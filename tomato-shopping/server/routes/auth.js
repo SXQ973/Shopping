@@ -112,8 +112,10 @@ router.post('/login', validateCsrfToken, async (req, res) => {
         });
         res.json({
             success: true,
-            redirect: user.is_admin ? '/admin' : '/index'
+            redirect: Boolean(user.isAdmin)? '/admin' : '/index'
         });
+        console.log("auth.js:login:redirect:",Boolean(user.isAdmin)? '/admin' : '/index');
+        console.log("auth.js:login:res",res);
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });

@@ -86,14 +86,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'include',
                 body: JSON.stringify({ email, password})
             });
-
             const data = await response.json();
-
+            console.log("login.js:data",data)
             if (response.ok) {
                 if (data.redirect) {
                     // Store user email to local storge
                     localStorage.setItem('userEmail', email);
-                    // redirect to index.html
+                    // redirect to index.html or admin.html
                     window.location.href = data.redirect;
                 }
             } else {

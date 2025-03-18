@@ -44,13 +44,13 @@ app.use(cors({
 // Session Configuration
 app.use(session({
     secret: process.env.SESSION_SECRET,
-    name: 'sessionId',  // Custom session cookie name
+    name: process.env.SESSION_COOKIE_NAME,  // Custom session cookie name
     resave: false,  // Don't save session if unmodified
     saveUninitialized: false,  // Don't create session until something stored
     cookie: {
-        secure: process.env.COOKIE_SECURE,  // Require HTTPS in production， for test, set false
-        httpOnly: process.env.COOKIE_HTTP_ONLY,  // Prevent client-side access to cookie
-        sameSite: process.env.COOKIE_SAME_SITE  // CSRF protection
+        secure: process.env.COOKIE_SECURE === 'true',  // Require HTTPS in production， for test, set false
+        httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',  // Prevent client-side access to cookie
+        sameSite: process.env.COOKIE_SAME_SITE // CSRF protection
     }
 }));
 

@@ -5,6 +5,7 @@ const pool = require('../config/db');
 const router = express.Router();
 
 const checkAuth = (req, res, next) => {
+    console.log("checkAuth:req.signedCookies",req.signedCookies);
     const sessionId = req.signedCookies[process.env.SESSION_COOKIE_NAME];
     if (!sessionId) {
         console.log("No session cookie found",sessionId);
@@ -15,8 +16,9 @@ const checkAuth = (req, res, next) => {
 
 // Check admin middleware
 const checkAdmin = (req, res, next) => {
+    console.log("checkAdmin:req.user",req.user);
     if (!req.user || !req.user.isAdmin) {
-        return res.redirect('/');
+        return res.redirect('/login');
     }
     next();
 };
@@ -25,9 +27,9 @@ const checkAdmin = (req, res, next) => {
 const addSecurityHeaders = (req, res, next) => {
     const nonce = SecurityUtils.generateNonce();
     res.locals.nonce = nonce;  
-    // 设置CSP
+    // CSP headers
     res.setHeader('Content-Security-Policy', SecurityUtils.generateCSP(nonce));
-    // 其他安全headers
+    // Other headers
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -58,7 +60,7 @@ router.get('/index', (req, res) => {
 });
 
 // Admin page
-router.get('/admin', checkAdmin, (req, res) => {
+router.get('/admin', checkAdmin, checkAuth,  (req, res) => {
     res.sendFile(path.join(__dirname, '../../client/admin.html'));
 });
 

@@ -204,7 +204,7 @@ function renderProducts(products) {
 async function fetchProductById(productId, cateid) {
   try {
    const product = productsData[cateid].find(p => p.pid === productId);
-   console.log("fetchProductById: product: ",product);
+   //console.log("fetchProductById: product: ",product);
    if (product) return product;
   } catch (error) {
     console.error('Error fetching product details:', error);

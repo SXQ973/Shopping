@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         if (validateForm(currentPassword, newPassword, confirmPassword)) {
-            console.log("frontend: email:",email,"currentPassword:",currentPassword,"newPassword:",newPassword);
+            //console.log("frontend: email:",email,"currentPassword:",currentPassword,"newPassword:",newPassword);
             if(!email)
                 throw new Error('No user email in storage');
             await handlePasswordChange(currentPassword, newPassword);
